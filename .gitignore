@@ -1,0 +1,10 @@
+# =========================
+# Datasets (raw, cleaned, processed)
+# =========================
+datasets/raw/
+datasets/cleaned/
+datasets/processed/
+
+# Prevent accidental addition of huge CSV/JSON elsewhere
+*.csv
+*.json
