@@ -164,7 +164,8 @@ python -m spacy download en_core_web_sm   # required spaCy model
 Here, each step is modular and can be run independently.
 
 From the project root, run:
-(a) Load raw JSON to CSV:
+
+**(a) Load raw JSON to CSV:**
 
 ```sh
 python scripts/load_data.py
@@ -176,7 +177,7 @@ You should get an output file within the datasets directory that appears similar
 datasets/loaded_and_cleaned/goodreads_reviews_<genre>_loaded.csv
 ```
 
-(b) Clean the data (filter blanks, dedupe, remove non-English): 
+**(b) Clean the data (filter blanks, dedupe, remove non-English):**
 
 Run: 
 
@@ -190,36 +191,45 @@ You should get an output file within the datasets directory that appears similar
 datasets/cleaned/goodreads_reviews_<genre>_clean.csv
 ```
 
-(c) Tier 1 Feature Engineering (link detection): 
+**(c) Tier 1 Feature Engineering (link detection):**
 
 Run: 
 ```sh
 python scripts/run_feature_engineering_tier1.py
 ```
+You should get an output file within the datasets directory that appears similar to the following: 
 
-Output → datasets/processed/goodreads_reviews_<genre>_with_links_flag.csv
+```sh
+datasets/processed/goodreads_reviews_<genre>_with_links_flag.csv
+```
 
-
-(d) Tier 2 Feature Engineering (NLP features): 
+**(d) Tier 2 Feature Engineering (NLP features):** 
 Run: 
 
 ```sh
 python scripts/run_feature_engineering_tier2.py
 ```
-Output → datasets/processed/goodreads_reviews_with_nlp_features_substantiveness_v2.csv
 
+You should get an output file within the datasets directory that appears similar to the following: 
 
-(e) Tier 2 Labeling (interaction features + substantiveness score): 
+```sh
+datasets/processed/goodreads_reviews_with_nlp_features_substantiveness_v2.csv
+```
+
+**(e) Tier 2 Labeling (interaction features + substantiveness score):**
 Run: 
 
 ```sh
 python scripts/run_feature_engineering_tier2_labeling.py
 ```
 
-Output → datasets/processed_and_labeled_for_training/goodreads_reviews_substantiveness.csv
+You should get an output file within the datasets directory that appears similar to the following: 
 
+```sh
+datasets/processed_and_labeled_for_training/goodreads_reviews_substantiveness.csv
+```
 
-(f) Train Logistic Regression Baseline: 
+**(f) Train Logistic Regression Baseline:**
 Run: 
 
 ```sh
