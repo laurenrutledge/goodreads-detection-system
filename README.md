@@ -163,9 +163,10 @@ python -m spacy download en_core_web_sm   # required spaCy model
 ### 3. Run the Processing Pipeline
 Here, each step is modular and can be run independently.
 
-From the project root, run:
+From the project root:
 
 **(a) Load raw JSON to CSV:**
+Run: 
 
 ```sh
 python scripts/load_data.py
