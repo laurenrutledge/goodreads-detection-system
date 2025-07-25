@@ -17,6 +17,11 @@ import os
 import sys
 import pandas as pd
 
+
+# Ensure project root is on path so relative paths work
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, PROJECT_ROOT)
+
 from src.feature_engineering_tier_two import (
     count_sentences,
     count_words,
@@ -25,17 +30,10 @@ from src.feature_engineering_tier_two import (
     mentions_person,
 )
 
-# --------------------------------
-
-# Ensure project root is on path so relative paths work
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, PROJECT_ROOT)
-
 INPUT_FILE = os.path.join(PROJECT_ROOT, "datasets", "feature_engineered", "goodreads_reviews_mystery_thriller_crime_clean_tier_one.csv")
 OUTPUT_FILE = os.path.join(PROJECT_ROOT, "datasets", "feature_engineered", "goodreads_reviews_tier_two.csv")
 
 # ---------------------------------------------------------------------
-
 
 
 def main():
@@ -50,11 +48,13 @@ def main():
     df['word_count'] = df['review_text'].apply(count_words)
     df['avg_words_per_sentence'] = df['review_text'].apply(avg_words_per_sentence)
     df['lexical_diversity'] = df['review_text'].apply(lexical_diversity)
-    #df['mentions_person'] = df['review_text'].apply(mentions_person)
+    df['mentions_person'] = df['review_text'].apply(mentions_person)
+
 
     print("\n--- Sample of engineered features ---")
     print(df[['review_text', 'sentence_count', 'word_count',
-              'avg_words_per_sentence', 'lexical_diversity']].head()), #'mentions_person']].head())
+              'avg_words_per_sentence', 'lexical_diversity', 'mentions_person']].head())
+
 
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     df.to_csv(OUTPUT_FILE, index=False)

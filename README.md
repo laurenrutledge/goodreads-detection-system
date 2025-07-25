@@ -108,52 +108,184 @@ Below shows further details of the model implemented in this repository:
 ```plaintext
 
 goodreads-detection-system/
-├── datasets/                                   # Raw, cleaned, and processed data (large files excluded from GitHub)
+├── datasets/                                       # Raw, cleaned, and processed data (large files excluded from GitHub)
 │
 ├── scripts/
-│   ├── load_data.py                            # Load raw JSON to CSV
-│   ├── clean_data.py                           # Clean data (filter, dedupe, language)
-│   ├── run_feature_engineering_tier1.py        # Adds link-flag feature
-│   ├── run_eda.py                              # Exploratory data analysis
+│   ├── load_data.py                                # Load raw JSON to CSV
+│   ├── clean_data.py                               # Clean data (filter, dedupe, language)
+│   ├── run_feature_engineering_tier1.py            # Adds link-flag feature
+│   ├── run_feature_engineering_tier2.py            # Adds NLP-based features (sentence/word counts, lexical diversity, etc.)
+│   ├── feature_engineer_labeling.py                # Adds interaction/ratio features and assigns substantiveness labels
+│   ├── logistical_regression.py                    # Trains and evaluates a multinomial logistic regression model
+│   ├── run_eda.py                                  # Exploratory data analysis
 │   └── __init__.py
 │
 ├── src/
-│   ├── data_loading.py                         # Functions for loading data
-│   ├── data_cleaning.py                        # Functions for cleaning data
-│   ├── feature_engineering_tier1.py            # Link-detection feature
+│   ├── data_loading.py                             # Functions for loading data
+│   ├── data_cleaning.py                            # Functions for cleaning data
+│   ├── feature_engineering_tier1.py                # Link-detection feature
+│   ├── feature_engineering_tier2.py                # NLP-based feature functions
+│   ├── feature_engineer_labeling.py                # Functions for interaction features and labeling
 │   └── __init__.py
 │
-├── notebooks/                                  # Archived notebooks used in early design/testing
+├── notebooks/                                      # Archived notebooks used in early design/testing
 │
-├── README.md                                   # Project documentation
-├── requirements.txt                            # Dependencies required to install to replicate project
-├── .gitignore                                  # Ignore rules for github maintanence (e.g., large raw data)
-└── LICENSE                                     # Project license file
-
-
+├── README.md                                       # Project documentation
+├── requirements.txt                                # Dependencies required to install to replicate project
+├── .gitignore                                      # Ignore rules for github maintanence (e.g., large raw data)
+└── LICENSE                                         # Project license file
 
 ```
 
 ## How to Run: 
 
 ### 1. Set Up the Environment
-- First, activate a Conda environment and install the required dependencies:
+Create and activate a Python 3.10 environment, then install dependencies from requirements.txt:
 
 ```sh
-conda create --name python=3.10 ? 
-pip install -r requirements.txt
+conda create -n goodreads-nlp python=3.10
 conda activate goodreads-nlp
+pip install -r requirements.txt
+python -m spacy download en_core_web_sm   # required spaCy model
+```
+
+### 2. Prepare Input Data
+- Place your raw Goodreads JSON Lines dataset(s) in:
+
+```sh
+./datasets/raw/
+ ```
+- For example:
+```sh
+./datasets/raw/goodreads_reviews_mystery_thriller_crime.json
+```
+  
+### 3. Run the Processing Pipeline
+Here, each step is modular and can be run independently.
+
+From the project root, run:
+(a) Load raw JSON to CSV:
+
+```sh
+python scripts/load_data.py
+```
+
+You should get an output file within the datasets directory that appears similar to the following: 
+
+```sh
+datasets/loaded_and_cleaned/goodreads_reviews_<genre>_loaded.csv
+```
+
+(b) Clean the data (filter blanks, dedupe, remove non-English): 
+
+Run: 
+
+```sh
+python scripts/clean_data.py
+```
+
+You should get an output file within the datasets directory that appears similar to the following: 
+
+```sh
+datasets/cleaned/goodreads_reviews_<genre>_clean.csv
+```
+
+(c) Tier 1 Feature Engineering (link detection): 
+
+Run: 
+```sh
+python scripts/run_feature_engineering_tier1.py
+```
+
+Output → datasets/processed/goodreads_reviews_<genre>_with_links_flag.csv
+
+
+(d) Tier 2 Feature Engineering (NLP features): 
+Run: 
+
+```sh
+python scripts/run_feature_engineering_tier2.py
+```
+Output → datasets/processed/goodreads_reviews_with_nlp_features_substantiveness_v2.csv
+
+
+(e) Tier 2 Labeling (interaction features + substantiveness score): 
+Run: 
+
+```sh
+python scripts/run_feature_engineering_tier2_labeling.py
+```
+
+Output → datasets/processed_and_labeled_for_training/goodreads_reviews_substantiveness.csv
+
+
+(f) Train Logistic Regression Baseline: 
+Run: 
+
+```sh
+python scripts/train_logistic_regression.py
+```
+
+Outputs:
+
+Accuracy, Classification Report, Confusion Matrix (printed to console)
+
+### 4. (Optional) Run EDA
+To visualize distributions and relationships:
+
+```sh
+python python scripts/run_eda.py
 ```
 
 ---
 
-### References 
+## Results: 
+
+```sh
+| Label                | Precision | Recall | F1‑Score | Support | 🔎 Interpretation                                                                                        |
+| -------------------- | --------- | ------ | -------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| **1 (low quality)**  | 0.78      | 0.81   | 0.80     | 70,812  | Very good detection of low‑quality reviews.                                                            |
+| **2**                | 0.76      | 0.66   | 0.70     | 65,091  | Recall is lower; many true “2”s are being predicted as something else (likely confusion with 1 or 3). |
+| **3 (mid quality)**  | 0.69      | 0.69   | 0.69     | 66,404  | Balanced performance; still room to improve.                                                           |
+| **4**                | 0.67      | 0.62   | 0.64     | 61,359  | Lower recall: the model struggles to identify some 4’s (maybe confusing them with 3’s or 5’s).        |
+| **5 (high quality)** | 0.78      | 0.91   | 0.84     | 63,114  | Excellent detection of high‑quality reviews.                                                           |
+```
+
+Confusion Matrix Insights: 
+```sh
+Predicted →
+True ↓     1     2     3     4     5
+1       57597  8492  3642   611   470
+2       15157 42636  3501  3453   344
+3        1047  4948 45692 11344  3373
+4          27     2 10952 38157 12221
+5           0     0  2432  3459 57223
+```
+
+Key observations:
+- Strong diagonal for 1 and 5: class 1 and 5 have high recall (81% and 91%) and low confusion.
+
+- Mix between 2 and 1: 15k true “2”s are being predicted as “1” → thresholds for low‑quality vs slightly better might need tuning or more nuanced features.
+
+- Overlap between 3 and 4: 11k true “3”s predicted as “4” and 10k true “4”s predicted as “3”.
+
+- These mid‑quality boundaries are hardest for a linear model to separate.
+
+### Summary
+Logistic Regression gives us a great baseline!
+- Accuracy: 73.8%
+- High quality (5): Excellent detection (Recall 91%)
+- Low quality (1): Strong detection (Recall 81%)
+- Mid classes (2/3/4): Some confusion—room to improve
+
+
+#### References 
 
 - Wan, et al. (2018), Monotonic Attention Networks for Contextual Word Representations.
 - Wan, et al. (2019), Spoiler Detection in Movie Reviews.
 - Julian McAuley’s Goodreads dataset: Dataset Portal
 
 ---
-### Author:
+#### Author:
 Lauren Rutledge    
 July 2025
