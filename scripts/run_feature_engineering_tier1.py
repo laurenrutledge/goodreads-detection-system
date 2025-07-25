@@ -19,7 +19,7 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
 
 import pandas as pd
-from src.feature_engineering_tier1 import add_link_flag
+from src.feature_engineering_tier_one import add_link_flag
 from src.data_loading import extract_genre
 
 # ===== CONFIG =====
@@ -51,7 +51,7 @@ def main():
     # Save processed CSV
     genre = extract_genre(INPUT_FILE)
     os.makedirs(OUTPUT_DIR, exist_ok=True)
-    output_path = os.path.join(OUTPUT_DIR, f"goodreads_reviews_{genre}_with_links_flag.csv")
+    output_path = os.path.join(OUTPUT_DIR, f"goodreads_reviews_{genre}_tier_one.csv")
     df.to_csv(output_path, index=False)
     print(f"Saved processed dataset with link flag to: {output_path}")
 

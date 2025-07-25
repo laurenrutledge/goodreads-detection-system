@@ -1,5 +1,6 @@
 # A Quality Detection System for Book Reviews Posted on Goodreads
 
+---
 
 ## Overview
 This project presents the foundation of an automated system for assessing the quality of book reviews collected from Goodreads, a widely used, public online book review platform.
@@ -8,7 +9,7 @@ Leveraging a large, publicly available dataset of free-text reviews written by G
 
 Current and ongoing work is focused on integrating transformer‑based models (starting with BERT) to directly analyze raw text for semantic depth, coherence, and contextual richness. Thereafter, future directions will include incorporating human‑labeled data to further refine model performance and experimenting with additional NLP architectures.
 
---
+
 
 ## Problem Statement: 
 The goal is to design and implement a system that can effectively analyze free-text book reviews, and: 
@@ -20,7 +21,7 @@ This project confronts this challenge by analyzing Goodreads’ free‑text revi
 - Feature engineering, and 
 - Natural language processing (NLP) 
 
-While this project currently focuses on Goodreads, the system is designed to be scalable and adaptable for other review platforms in the future.
+While this project currently focuses on the Goodreads review platform, the system is designed to be scalable and adaptable for other review platforms in the future.
 
 
 ## Project Scope, Dataset, Assumptions, and Target Users: 
@@ -30,23 +31,29 @@ Due to the time and computational constraints of this project, the current imple
 
 The system is designed to detect and categorize quality issues, which are organized into two tiers: 
 1. Tier One: Reviews containing what is likely malicious content, such as harmful links, spam, or self‑promotional material.
-2. Tier Two: Reviews scored on substantiveness and appropriateness.
+2. Tier Two: Reviews scored on a "quality scale" based on substantiveness and appropriateness.
 
 ### Dataset: 
-Raw data source: Julian McAuley’s Goodreads dataset (goodreads_reviews_.json.gz), which can be accessed via: https://cseweb.ucsd.edu/~jmcauley/datasets/goodreads.html#datasets
+The raw datasets used in this project are based on user reviews that were assembled and introduced in prior research, specifically:
+- Wan et al., 2018 (Monotonic Attention Networks for Contextual Word Representations).
+- Wan et al., 2019 (Spoiler Detection in Movie Reviews).
 
-Key fields from raw dataset used:
-- user_id 
-- review_id
-- review_text 
-- rating 
-- date_added 
-- n_votes.
+The actual data referenced and processed in this project was pulled from Julian McAuley’s publicly available Goodreads dataset (goodreads_reviews_dedup.json.gz), which can be accessed here:
+https://cseweb.ucsd.edu/~jmcauley/datasets/goodreads.html#datasets
 
-All non‑English reviews were removed prior to processing via langdetect.
+The following key fields were then extracted from the raw dataset:
+
+- user_id – anonymized identifier for the user
+- review_id – anonymized identifier for the review
+- review_text – free‑text content of the review
+- rating – star rating (typically 1–5)
+- date_added – timestamp of when the review was posted 
+- n_votes – number of votes or “helpful” marks from other users
+
+During pre-processesing, only reviews with non‑empty review_text and valid user_id, review_id, and date_added were retained. Non‑English reviews were also removed prior to processing via langdetect.
 
 ### Assumptions: 
-The following assumptions (as of now) were made in order to scope and implement this project within the given time and computational constraints:
+The following assumptions were made in order to scope and implement this iteration of the project. Ideally, assumptions will be removed as more time and computational constraints are granted toward this project:
 - Data Availability: The datasets curated and published by Julian McAuley are assumed to be accurate, complete, and representative of Goodreads’ public review ecosystem. 
 - Metadata Reliability: Fields such as \textbf{user\_id}, \textbf{review\_id}, \textbf{rating}, and \textbf{date\_added} are assumed to be correctly associated with each review and free from systemic errors.
 - Static Dataset: The analysis is based on a static dataset collected in 2017, and it is assumed that trends and anomalies detected remain relevant to the current Goodreads platform.
@@ -69,7 +76,7 @@ The objective of this project is to lay the foundation for a system that (1) aut
 
 ### Feature Engineering: 
 
-The feature engineering process was broken down into two tiers to 
+The feature engineering process was broken down into two tiers:  
 - Tier One: Flag reviews containing hyperlinks using regex patterns (e.g., http://, www., .com, .org, .net).
 - Tier Two: Compute linguistic & metadata features:
   - Sentence count
@@ -83,17 +90,17 @@ All continuous features are standardized (zero mean, unit variance).
 
 ### Model(s): (s) since there are more to come!
 
-Model 1: Logistic regression, which was selected as the baseline model because of its  a which was necessary for the scope of this project.
+**Model 1: Multinomial Logistic Regression**: 
 
+Why Logistic Regression? 
 - **Computational Efficiency**: Extremely important given the scope of this project and large datasets
 - **Interpretability**: Feature coefficients
 - **Robustness**: As a simpler baseline before more complex models (BERT)
 
-Here, the model implementation was de
+Below shows further details of the model implemented in this repository: 
 - Multinomial Logistic Regression with 5 quality levels (1–5)
 - Train/test split: 80/20
 - Metrics: Accuracy, Precision, Recall, F1 score, Confusion Matrix
-- 
 
 
 
@@ -101,7 +108,7 @@ Here, the model implementation was de
 ```plaintext
 
 goodreads-detection-system/
-├── datasets/                                   # All raw, cleaned, and processed datasets used and produced during this project. Details excluded as github cannot accomodate each dataset's size. 
+├── datasets/                                   # Raw, cleaned, and processed data (large files excluded from GitHub)
 │
 ├── scripts/
 │   ├── load_data.py                            # Load raw JSON to CSV
@@ -116,12 +123,13 @@ goodreads-detection-system/
 │   ├── feature_engineering_tier1.py            # Link-detection feature
 │   └── __init__.py
 │
+├── notebooks/                                  # Archived notebooks used in early design/testing
+│
 ├── README.md                                   # Project documentation
 ├── requirements.txt                            # Dependencies required to install to replicate project
 ├── .gitignore                                  # Ignore rules for github maintanence (e.g., large raw data)
-├── LICENSE                                     # Project license file
-│
-└── notebooks/                                  # Archived notebooks/scripts originally used in project design and testing, no longer used in current setup
+└── LICENSE                                     # Project license file
+
 
 
 ```
@@ -135,3 +143,17 @@ goodreads-detection-system/
 conda create --name python=3.10 ? 
 pip install -r requirements.txt
 conda activate goodreads-nlp
+```
+
+---
+
+### References 
+
+- Wan, et al. (2018), Monotonic Attention Networks for Contextual Word Representations.
+- Wan, et al. (2019), Spoiler Detection in Movie Reviews.
+- Julian McAuley’s Goodreads dataset: Dataset Portal
+
+---
+### Author:
+Lauren Rutledge    
+July 2025
