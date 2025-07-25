@@ -4,7 +4,12 @@
 datasets/raw/
 datasets/cleaned/
 datasets/processed/
+datasets/loaded_and_cleaned/
 
 # Prevent accidental addition of huge CSV/JSON elsewhere
 *.csv
 *.json
+
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
