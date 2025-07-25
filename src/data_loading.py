@@ -1,7 +1,7 @@
 """
 data_loading.py
 ---------------
-Module responsible for loading raw Goodreads data from JSON Lines files
+This module is responsible for loading raw Goodreads data from JSON Lines files
 and performing initial lightweight processing such as selecting required columns
 and extracting metadata (e.g., genre from the filename).
 
