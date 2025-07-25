@@ -2,6 +2,10 @@
 
 ---
 
+For a full detailed report, please see: goodreads_project.pdf in the main branch of repository.
+
+---
+
 ## Overview
 This project presents the foundation of an automated system for assessing the quality of book reviews collected from Goodreads, a widely used, public online book review platform.
 
@@ -205,6 +209,7 @@ datasets/processed/goodreads_reviews_<genre>_with_links_flag.csv
 ```
 
 **(d) Tier 2 Feature Engineering (NLP features):** 
+
 Run: 
 
 ```sh
@@ -218,6 +223,7 @@ datasets/processed/goodreads_reviews_with_nlp_features_substantiveness_v2.csv
 ```
 
 **(e) Tier 2 Labeling (interaction features + substantiveness score):**
+
 Run: 
 
 ```sh
@@ -231,6 +237,7 @@ datasets/processed_and_labeled_for_training/goodreads_reviews_substantiveness.cs
 ```
 
 **(f) Train Logistic Regression Baseline:**
+
 Run: 
 
 ```sh
@@ -255,11 +262,11 @@ python python scripts/run_eda.py
 ```sh
 | Label                | Precision | Recall | F1‑Score | Support | 🔎 Interpretation                                                                                        |
 | -------------------- | --------- | ------ | -------- | ------- | -------------------------------------------------------------------------------------------------------- |
-| **1 (low quality)**  | 0.78      | 0.81   | 0.80     | 70,812  | Very good detection of low‑quality reviews.                                                            |
-| **2**                | 0.76      | 0.66   | 0.70     | 65,091  | Recall is lower; many true “2”s are being predicted as something else (likely confusion with 1 or 3). |
-| **3 (mid quality)**  | 0.69      | 0.69   | 0.69     | 66,404  | Balanced performance; still room to improve.                                                           |
-| **4**                | 0.67      | 0.62   | 0.64     | 61,359  | Lower recall: the model struggles to identify some 4’s (maybe confusing them with 3’s or 5’s).        |
-| **5 (high quality)** | 0.78      | 0.91   | 0.84     | 63,114  | Excellent detection of high‑quality reviews.                                                           |
+| **1 (low quality)**  | 0.78      | 0.81   | 0.80     | 70,812  | Very good detection of low‑quality reviews.                                                              |
+| **2**                | 0.76      | 0.66   | 0.70     | 65,091  | Recall is lower; many true “2”s are being predicted as something else (likely confusion with 1 or 3).    |
+| **3 (mid quality)**  | 0.69      | 0.69   | 0.69     | 66,404  | Balanced performance; still room to improve.                                                             |
+| **4**                | 0.67      | 0.62   | 0.64     | 61,359  | Lower recall: the model struggles to identify some 4’s (maybe confusing them with 3’s or 5’s).           |
+| **5 (high quality)** | 0.78      | 0.91   | 0.84     | 63,114  | Excellent detection of high‑quality reviews.                                                             |
 ```
 
 Confusion Matrix Insights: 
@@ -273,7 +280,7 @@ True ↓     1     2     3     4     5
 5           0     0  2432  3459 57223
 ```
 
-Key observations:
+**Key observations:**
 - Strong diagonal for 1 and 5: class 1 and 5 have high recall (81% and 91%) and low confusion.
 
 - Mix between 2 and 1: 15k true “2”s are being predicted as “1” → thresholds for low‑quality vs slightly better might need tuning or more nuanced features.
